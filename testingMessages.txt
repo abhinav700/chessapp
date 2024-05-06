@@ -1,0 +1,26 @@
+{
+    "type":"init_game"
+}
+
+// white move
+{
+    "type":"make_move",
+    "payload":{
+        "move":{
+            "from":"a2",
+            "to":"a3"
+        }
+    }
+}
+
+
+// black move
+{
+    "type":"make_move",
+    "payload":{
+        "move":{
+            "from":"a7",
+            "to":"a6"
+        }
+    }
+}
