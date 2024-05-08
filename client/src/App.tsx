@@ -19,7 +19,7 @@ function App() {
   }
   ]);
   return (
-    <div className="App">
+    <div className="App bg-[#242b25] h-screen">
         <RouterProvider router={router} />
     </div>
   );
