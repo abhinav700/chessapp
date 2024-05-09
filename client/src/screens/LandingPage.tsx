@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../Components/Button";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -23,12 +24,15 @@ const LandingPage = () => {
             Play Chess online on the #1 website
           </h1>{" "}
           {/* Center text, adjust padding, add margin */}
-          <button
+          <Button onClick={onPlayOnlineClick}>
+            Play Online
+          </Button>
+          {/* <button
             onClick={onPlayOnlineClick}
             className="bg-black p-3 text-white rounded-md shadow-md hover:shadow-lg hover:bg-[#1a1919]"
           >
             Play online
-          </button>{" "}
+          </button>{" "} */}
           {/* Add shadow and hover effect */}
         </div>
       </div>
