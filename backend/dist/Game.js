@@ -49,7 +49,12 @@ class Game {
         else {
             const emitMessage = JSON.stringify({
                 type: messages_1.MAKE_MOVE,
-                payload: move,
+                payload: {
+                    move: {
+                        from: move.from,
+                        to: move.to
+                    }
+                },
             });
             if (this.movesCount % 2 === 0)
                 this.player2.send(emitMessage);

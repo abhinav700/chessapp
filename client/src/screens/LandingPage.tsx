@@ -24,7 +24,7 @@ const LandingPage = () => {
             Play Chess online on the #1 website
           </h1>{" "}
           {/* Center text, adjust padding, add margin */}
-          <Button onClick={onPlayOnlineClick}>
+          <Button style = {"px-8 py-2 font-bold bg-green-700 rounded text-white hover:bg-green-600 cursor-pointer col-span-2"} onClick={onPlayOnlineClick}>
             Play Online
           </Button>
           {/* <button
