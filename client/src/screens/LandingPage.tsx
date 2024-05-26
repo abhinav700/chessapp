@@ -14,7 +14,7 @@ const LandingPage = () => {
           {" "}
           {/* Center both horizontally and vertically */}
           <img
-            src={"/chessboard.jpeg"}
+            src={"/images/chessboard.jpeg"}
             className="w-[500px] md:w-[700px]"
           />{" "}
           {/* Set image height */}

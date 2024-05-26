@@ -1,6 +1,8 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import React, { useEffect, useState } from "react";
 import { MAKE_MOVE } from "../messages";
+import moveSelfAudio  from "../assets/sounds/move-self.mp3"
+import { playSound } from "../utils/playSound";
 
 type ChessBoardProps = {
   board: ({
@@ -13,10 +15,16 @@ type ChessBoardProps = {
   setBoard: any;
 };
 
+
+console.log(moveSelfAudio)
 const ChessBoard = ({ chess, board, setBoard, socket }: ChessBoardProps) => {
+  
   const [from, setFrom] = useState<Square | null>(null);
   const [to, setTo] = useState<Square | null>(null);
 
+  
+   
+  
   const onClickHandler = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     squareRepresentation: Square | null
@@ -28,6 +36,7 @@ const ChessBoard = ({ chess, board, setBoard, socket }: ChessBoardProps) => {
       setTo((to) => squareRepresentation);
       chess.move({ from: from, to: squareRepresentation });
       setBoard(chess.board());
+      playSound(moveSelfAudio)
       const mess = JSON.stringify({
         type: MAKE_MOVE,
         payload: {
@@ -49,7 +58,7 @@ const ChessBoard = ({ chess, board, setBoard, socket }: ChessBoardProps) => {
   } | null) => {
     {
       const piece = `${square?.color}${square?.type}`
-      return square ? <img className="w-24" src={`/${piece}.png`} /> : "";
+      return square ? <img className="w-24" src={`/images/${piece}.png`} /> : "";
     }
   };
   return (
