@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GAME_OVER, INIT_GAME, MAKE_MOVE } from "../messages";
+import { GAME_OVER, GAME_STARTED, INIT_GAME, MAKE_MOVE } from "../messages";
 import { Chess } from "chess.js";
 import moveSelfAudio  from "../assets/sounds/move-self.mp3"
 import { playSound } from "../utils/playSound";
@@ -7,7 +7,7 @@ import { playSound } from "../utils/playSound";
 const useHandleMessage = (socket: WebSocket | null) => {
   const [chess, setChess] = useState<Chess | null>(new Chess());
   const [board, setBoard] = useState(chess?.board());
-
+  const [playerColor, setPlayerColor] = useState<string | null>(null)
   useEffect(() => {
     if (!socket) return;
 
@@ -34,11 +34,14 @@ const useHandleMessage = (socket: WebSocket | null) => {
 
         case GAME_OVER:
           break;
+        case GAME_STARTED:
+            setPlayerColor(message.payload.color) 
+          break;
         default:
           break;
       }
     };
   }, [socket]);
-  return {chess, board,  setBoard};
+  return {chess, board,  setBoard,playerColor};
 };
 export default useHandleMessage;

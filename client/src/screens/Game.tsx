@@ -7,7 +7,7 @@ import ChessBoard from "../Components/ChessBoard";
 
 const Game = () => {
   const socket = useSocket();
-  const { chess, board, setBoard } = useHandleMessage(socket);
+  const { chess, board, setBoard,playerColor } = useHandleMessage(socket);
   const [started, setStarted] = useState(false);
   const onClickPlay = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setStarted((started) => true);
@@ -27,6 +27,7 @@ const Game = () => {
             board={board!}
             socket={socket}
             setBoard={setBoard}
+            myColor={playerColor}
           />
         </div>
         <div className=" ">

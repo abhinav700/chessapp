@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { MAKE_MOVE } from "../messages";
 import moveSelfAudio from "../assets/sounds/move-self.mp3";
 import { playSound } from "../utils/playSound";
+import { useRecoilState } from "recoil";
+import { isBoardFlippedAtom } from "../state/atoms/Chessboard";
 
 type ChessBoardProps = {
   board: ({
@@ -13,13 +15,17 @@ type ChessBoardProps = {
   socket: WebSocket;
   chess: any;
   setBoard: any;
+  myColor:string | null;
 };
 
 console.log(moveSelfAudio);
-const ChessBoard = ({ chess, board, setBoard, socket }: ChessBoardProps) => {
+const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps) => {
   const [from, setFrom] = useState<Square | null>(null);
   const [to, setTo] = useState<Square | null>(null);
-
+  const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
+  useEffect(()=>{
+    setIsFlipped(isFlipped => myColor === "black");
+  },[myColor])
   const onClickHandler = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     squareRepresentation: Square | null
@@ -46,7 +52,7 @@ const ChessBoard = ({ chess, board, setBoard, socket }: ChessBoardProps) => {
       setFrom(null);
     }
   };
-  const displayCharacter = (
+  const displayPiece = (
     square: {
       square: Square;
       type: PieceSymbol;
@@ -71,29 +77,35 @@ const ChessBoard = ({ chess, board, setBoard, socket }: ChessBoardProps) => {
   };
   return (
     <div className="text-white">
-      {board.map((row, i) => {
+        <h1>{myColor}</h1>
+
+      {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
+        i = isFlipped ? i + 1 : 8 - i 
         return (
           <div key={i} className="flex 	">
-            {row.map((square, j) => {
-              const squareRepresentation = (String.fromCharCode(97 + (j % 8)) +
+            {(isFlipped ? row.slice().reverse():row).map((square, j) => {
+               j = isFlipped ? 8 - j : j + 1
+              const squareRepresentation = (String.fromCharCode(97 + j - 1 ) +
                 "" +
-                (8 - i)) as Square;
+                (i)) as Square;
+              console.log(squareRepresentation)
               return (
                 <div
                   key={j}
-                  className={`lg:w-24 lg:h-24 ${
-                    (i + j) % 2 == 0 ? "bg-green-800" : "bg-white text-black"
-                  } flex w-20 h-20` }
+                  className={`text-black ${(i + j) % 2 == 0 ? "bg-green-800" : "bg-white"} flex w-16 h-16` }
                   onClick={(e) => onClickHandler(e, squareRepresentation)}
                 >
-                  {j === 0 ? (
-                    <p className="relative mt-[5px] lg:left-2"> {8 - i} </p>
+
+
+                  {((!isFlipped && j == 1) || (isFlipped && j == 8 )) ? (
+                    <p className="relative mt-[5px] lg:left-2"> {i} </p>
                   ) : null}
 
-                  {displayCharacter(square)}
-                  {i === 7 ? (
+                  {displayPiece(square)}
+                  {((!isFlipped && i == 1) || (isFlipped && i == 8))  ? (
                     <p className="relative mt-[55px] lg:mt-[65px]  right-2">
-                      {String.fromCharCode(97 + j)}
+                      {
+                     String.fromCharCode(97 + j -1)}
                     </p>
                   ) : null}
                 </div>
