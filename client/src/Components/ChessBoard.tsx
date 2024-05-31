@@ -65,7 +65,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
         <>
           {square ? (
             <img
-              className="w-12 xl:w-20 lg:w-16 w-12 mx-auto my-auto"
+              className="lg:w-14 w-11 my-auto"
               src={`/images/${piece}.png`}
             />
           ) : (
@@ -98,12 +98,12 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
 
 
                   {((!isFlipped && j == 1) || (isFlipped && j == 8 )) ? (
-                    <p className="relative mt-[5px] lg:left-2"> {i} </p>
+                    <p className="relative  w-[1px] "> {i} </p>
                   ) : null}
 
                   {displayPiece(square)}
                   {((!isFlipped && i == 1) || (isFlipped && i == 8))  ? (
-                    <p className="relative mt-[55px] lg:mt-[65px]  right-2">
+                    <p className="relative mt-[45px] w-[2px] right-2">
                       {
                      String.fromCharCode(97 + j -1)}
                     </p>
