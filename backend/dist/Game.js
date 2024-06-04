@@ -14,20 +14,13 @@ class Game {
         player2.send(JSON.stringify({ type: messages_1.GAME_STARTED, payload: { color: "black" } }));
     }
     makeMove(player, move) {
-        //checking if correct player is making the move
-        console.log("Entered make move function");
-        console.log(this.movesCount);
         if (this.movesCount % 2 == 0 && player != this.player1) {
-            console.log("Player 1 was supposed to make the move but not player 1");
-            console.log(this.board.moves());
             return;
         }
         if (this.movesCount % 2 == 1 && player != this.player2) {
-            console.log("Player 2 was supposed to make the move but not player 2");
             return;
         }
         try {
-            console.log("Entered try catch");
             this.board.move(move);
         }
         catch (error) {
@@ -35,7 +28,6 @@ class Game {
             return;
         }
         if (this.board.isGameOver()) {
-            console.log("Game over");
             const emitMessage = JSON.stringify({
                 type: messages_1.GAME_OVER,
                 payload: {
@@ -50,10 +42,7 @@ class Game {
             const emitMessage = JSON.stringify({
                 type: messages_1.MAKE_MOVE,
                 payload: {
-                    move: {
-                        from: move.from,
-                        to: move.to
-                    }
+                    move
                 },
             });
             if (this.movesCount % 2 === 0)

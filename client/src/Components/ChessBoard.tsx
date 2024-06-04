@@ -15,36 +15,39 @@ type ChessBoardProps = {
   socket: WebSocket;
   chess: any;
   setBoard: any;
-  myColor:string | null;
+  myColor: string | null;
 };
 
 console.log(moveSelfAudio);
+
 const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps) => {
   const [from, setFrom] = useState<Square | null>(null);
-  const [to, setTo] = useState<Square | null>(null);
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
-  useEffect(()=>{
+  useEffect(() => {
     setIsFlipped(isFlipped => myColor === "black");
-  },[myColor])
+  }, [myColor])
   const onClickHandler = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     squareRepresentation: Square | null
   ) => {
     if (!from) {
       setFrom((from) => squareRepresentation);
-      console.log("Entering if statement : ", { from, to });
     } else {
-      setTo((to) => squareRepresentation);
-      chess.move({ from: from, to: squareRepresentation });
+      let move;
+      if(isPromoting(squareRepresentation!, from, chess)){
+        move =  {from, to: squareRepresentation,promotion:"q" }
+        chess.move(move);
+      }
+      else{
+        move = {from, to:squareRepresentation};
+        chess.move(move);
+      }
       setBoard(chess.board());
       playSound(moveSelfAudio);
       const mess = JSON.stringify({
         type: MAKE_MOVE,
         payload: {
-          move: {
-            from: from,
-            to: squareRepresentation,
-          },
+          move
         },
       });
       console.log(mess);
@@ -52,6 +55,19 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       setFrom(null);
     }
   };
+
+  const isPromoting = (to: Square, from: Square, chess: Chess) => {
+    if (!from)
+      return false;
+    const piece = chess.get(from);
+    if (piece.type != 'p')
+      return false;
+    if (to[1] != '1' && to[1] != '8')
+      return false;
+
+    return true;
+
+  }
   const displayPiece = (
     square: {
       square: Square;
@@ -76,36 +92,39 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
     }
   };
   return (
+    <>
+      
     <div className="text-white">
-        <h1>{myColor}</h1>
-
+      <h1>{myColor}</h1>
+    z
+      
       {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
-        i = isFlipped ? i + 1 : 8 - i 
+        i = isFlipped ? i + 1 : 8 - i
         return (
           <div key={i} className="flex 	">
-            {(isFlipped ? row.slice().reverse():row).map((square, j) => {
-               j = isFlipped ? 8 - j : j + 1
-              const squareRepresentation = (String.fromCharCode(97 + j - 1 ) +
+            {(isFlipped ? row.slice().reverse() : row).map((square, j) => {
+              j = isFlipped ? 8 - j : j + 1
+              const squareRepresentation = (String.fromCharCode(97 + j - 1) +
                 "" +
                 (i)) as Square;
               console.log(squareRepresentation)
               return (
                 <div
                   key={j}
-                  className={`text-black ${(i + j) % 2 == 0 ? "bg-green-800" : "bg-white"} flex w-16 h-16` }
+                  className={`text-black ${(i + j) % 2 == 0 ? "bg-green-800" : "bg-white"} flex w-16 h-16`}
                   onClick={(e) => onClickHandler(e, squareRepresentation)}
                 >
 
 
-                  {((!isFlipped && j == 1) || (isFlipped && j == 8 )) ? (
+                  {((!isFlipped && j == 1) || (isFlipped && j == 8)) ? (
                     <p className="relative  w-[1px] "> {i} </p>
                   ) : null}
 
                   {displayPiece(square)}
-                  {((!isFlipped && i == 1) || (isFlipped && i == 8))  ? (
+                  {((!isFlipped && i == 1) || (isFlipped && i == 8)) ? (
                     <p className="relative mt-[45px] w-[2px] right-2">
                       {
-                     String.fromCharCode(97 + j -1)}
+                        String.fromCharCode(97 + j - 1)}
                     </p>
                   ) : null}
                 </div>
@@ -115,6 +134,8 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
         );
       })}
     </div>
+    </>
+
   );
 };
 
