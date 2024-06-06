@@ -5,7 +5,7 @@ import moveSelfAudio from "../assets/sounds/move-self.mp3";
 import { playSound } from "../utils/playSound";
 import { useRecoilState } from "recoil";
 import { isBoardFlippedAtom } from "../state/atoms/Chessboard";
-
+import illegalMoveSound from "../assets/sounds/illegal-move.mp3"
 type ChessBoardProps = {
   board: ({
     square: Square;
@@ -18,13 +18,13 @@ type ChessBoardProps = {
   myColor: string | null;
 };
 
-console.log(moveSelfAudio);
 
 const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps) => {
   const [from, setFrom] = useState<Square | null>(null);
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
   const [showPromotionModal, setShowPromotionModal] = useState(false)
   const [to, setTo] = useState<Square | null>(null)
+  
   const [promotingTo, setPromotingTo] = useState<null | string>(null)
   const promotionOptions = ['q', 'r', 'b', 'n']
   const promotionOptionsImages = promotionOptions.map((type) => {
@@ -34,7 +34,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       <img
         className="lg:w-14 w-11 my-3 mx-1 cursor-pointer hover:opacity-70"
         src={`/images/${piece}.png`}
-        onClick={(e)=>{setPromotingTo(promotingTo =>type)}}
+        onClick={(e) => { setPromotingTo(promotingTo => type) }}
       />
     )
   })
@@ -51,18 +51,29 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   }, [promotingTo])
 
 
+  const isLegalMove = (move: { from: Square; to: Square, promotion?: string }) => {
+    return chess
+      .moves({ square: move.from, verbose: true })
+      .map((it: any) => it.to)
+      .includes(move.to);
+  }
   const updateBoardAfterMove = (move: { from: Square; to: Square, promotion?: string }) => {
-    chess.move(move);
-    const mess = JSON.stringify({
-      type: MAKE_MOVE,
-      payload: {
-        move
-      },
-    });
-    setBoard(chess.board());
-    playSound(moveSelfAudio);
-    socket.send(mess);
-    setFrom(null);
+    if (isLegalMove(move)) {
+      chess.move(move);
+      const mess = JSON.stringify({
+        type: MAKE_MOVE,
+        payload: {
+          move
+        },
+      });
+      setBoard(chess.board());
+      playSound(moveSelfAudio);
+      socket.send(mess);
+    }
+    else
+      playSound(illegalMoveSound)
+    setFrom(from => null);
+    setTo(to => null)
   }
   const makeMoveHandler = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -75,10 +86,11 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       setTo(to => squareRepresentation)
       if (!isPromoting(squareRepresentation!, from, chess)) {
         move = { from: from!, to: squareRepresentation! };
+        console.log(move)
         updateBoardAfterMove(move);
 
       }
- 
+
     }
   };
 
@@ -119,15 +131,15 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   };
   return (
     <>
-{
-  showPromotionModal&&<div className="flex flex-col items-center w-[240px] h-[200px] bg-slate-500 relative rounded-lg top-[155px] lg:top-[160px] left-[125px] lg:left-[135px]">
-        <h1 className="text-xl"> Pawn Promotion</h1>
-        <div className="flex flex-wrap w-[140px] justify-center items-center">
-          {promotionOptionsImages}
+      {
+        showPromotionModal && <div className="flex flex-col items-center w-[240px] h-[200px] bg-slate-500 relative rounded-lg top-[155px] lg:top-[160px] left-[125px] lg:left-[135px]">
+          <h1 className="text-xl"> Pawn Promotion</h1>
+          <div className="flex flex-wrap w-[140px] justify-center items-center">
+            {promotionOptionsImages}
+          </div>
         </div>
-      </div>
-}
-      
+      }
+
       <div className={`text-white ${showPromotionModal ? 'mt-[-200px]' : ""}`}>
         <h1>{myColor}</h1>
         {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
@@ -139,7 +151,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
                 const squareRepresentation = (String.fromCharCode(97 + j - 1) +
                   "" +
                   (i)) as Square;
-                console.log(squareRepresentation)
+                // console.log(squareRepresentation)
                 return (
                   <div
                     key={j}
