@@ -24,7 +24,6 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
   const [showPromotionModal, setShowPromotionModal] = useState(false)
   const [to, setTo] = useState<Square | null>(null)
-  
   const [promotingTo, setPromotingTo] = useState<null | string>(null)
   const promotionOptions = ['q', 'r', 'b', 'n']
   const promotionOptionsImages = promotionOptions.map((type) => {
@@ -38,6 +37,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       />
     )
   })
+
   useEffect(() => {
     setIsFlipped(isFlipped => myColor === "black");
   }, [myColor])
@@ -50,7 +50,13 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
     }
   }, [promotingTo])
 
-
+  const isMyTurn = () => {
+    let movesCount = chess.history().length;
+    if (myColor == 'white')
+      return movesCount % 2 == 0;
+    else if (myColor == 'black')
+      return movesCount % 2 == 1;
+  }
   const isLegalMove = (move: { from: Square; to: Square, promotion?: string }) => {
     return chess
       .moves({ square: move.from, verbose: true })
@@ -66,6 +72,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
           move
         },
       });
+
       setBoard(chess.board());
       playSound(moveSelfAudio);
       socket.send(mess);
@@ -141,7 +148,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       }
 
       <div className={`text-white ${showPromotionModal ? 'mt-[-200px]' : ""}`}>
-        <h1>{myColor}</h1>
+        {myColor && <h1>{isMyTurn() ? "Your Turn" : "Opponent's Turn"}</h1>}
         {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
           i = isFlipped ? i + 1 : 8 - i
           return (
