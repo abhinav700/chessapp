@@ -128,9 +128,10 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
     const piece = chess.get(from);
     if (piece.type != 'p')
       return false;
-    if (to[1] != '1' && to[1] != '8')
+    if (to[1] != '1' && to[1] != '8') 
       return false;
-
+    if((to[1] == "1" && myColor != "black") || (to[1] == "8" && myColor =="white"))
+      return false;
     setShowPromotionModal(showPromotionModal => true);
     return true;
   }
