@@ -30,22 +30,22 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   console.log("Chessboard rerendered")
   useEffect(() => {
     console.log("Setting legal moves")
-    setLegalMoves(legalMoves => from !=null ? chess.moves({square : from}) : []);
+    setLegalMoves(legalMoves => from != null ? chess.moves({ square: from }) : []);
   }, [from])
 
 
-  const isThisLegalSquare = (square : Square) => {
-     if(legalMoves.length == 0)
+  const isThisLegalSquare = (square: Square) => {
+    if (legalMoves.length == 0)
       return false;
-     let ans = false;
-     legalMoves.map((it) => {
-        if(it.includes(square))
-            ans = true;
-     })
-     if(ans)
-        console.log(square);
- 
-     return ans;
+    let ans = false;
+    legalMoves.map((it) => {
+      if (it.includes(square))
+        ans = true;
+    })
+    if (ans)
+      console.log(square);
+
+    return ans;
   }
 
   useEffect(() => {
@@ -88,14 +88,29 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   }
 
   const makeMoveHandler = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    squareRepresentation: Square | null
+
+    squareRepresentation: Square | null, square: {
+      square: Square;
+      type: PieceSymbol;
+      color: Color;
+    } | null
   ) => {
     console.log("make Move handler")
     if (!from) {
       console.log("setting from")
       setFrom((from) => squareRepresentation);
-    } else {
+    }
+    
+    else {
+      if (square != null && myColor && square.color == myColor[0]) {
+        setFrom(from => squareRepresentation);
+        return;
+      }
+      
+      else if(square != null && myColor === null){
+        setFrom(from => squareRepresentation);
+        return;
+      }
       let move;
       setTo(to => squareRepresentation)
       if (!isPromoting(squareRepresentation!, from, chess)) {
@@ -169,8 +184,8 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
                 return (
                   <div
                     key={j}
-                    className={`text-black ${isThisLegalSquare(squareRepresentation) ?((i + j) % 2 == 0 ? "bg-slate-600" :"bg-slate-500"):((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-16 h-16`}
-                    onClick={(e) => makeMoveHandler(e, squareRepresentation)}
+                    className={`text-black ${isThisLegalSquare(squareRepresentation) ? ((i + j) % 2 == 0 ? "bg-slate-600" : "bg-slate-500") : ((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-16 h-16`}
+                    onClick={(e) => makeMoveHandler(squareRepresentation, square)}
                   >
 
 
