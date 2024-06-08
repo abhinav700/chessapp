@@ -6,6 +6,7 @@ import { playSound } from "../utils/playSound";
 import { useRecoilState } from "recoil";
 import { isBoardFlippedAtom } from "../state/atoms/Chessboard";
 import illegalMoveSound from "../assets/sounds/illegal-move.mp3"
+import usePawnPromotion from "../hooks/usePawnPromotion";
 type ChessBoardProps = {
   board: ({
     square: Square;
@@ -24,32 +25,14 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
   const [showPromotionModal, setShowPromotionModal] = useState(false)
   const [to, setTo] = useState<Square | null>(null)
-  const [promotingTo, setPromotingTo] = useState<null | string>(null)
-  const promotionOptions = ['q', 'r', 'b', 'n']
-  const promotionOptionsImages = promotionOptions.map((type) => {
-    const color = myColor === "black" ? "b" : 'w';
-    const piece = `${color}${type}`;
-    return (
-      <img
-        className="lg:w-14 w-11 my-3 mx-1 cursor-pointer hover:opacity-70"
-        src={`/images/${piece}.png`}
-        onClick={(e) => { setPromotingTo(promotingTo => type) }}
-      />
-    )
-  })
+  const {promotionOptionsImages} = usePawnPromotion({myColor, from, to, updateBoardAfterMove, setShowPromotionModal})
+
 
   useEffect(() => {
     setIsFlipped(isFlipped => myColor === "black");
   }, [myColor])
 
-  useEffect(() => {
-    if (promotingTo) {
-      const move = { from: from!, to: to!, promotion: promotingTo! };
-      updateBoardAfterMove(move)
-      setShowPromotionModal(showPromotionModal => false);
-    }
-  }, [promotingTo])
-
+  
   const isMyTurn = () => {
     let movesCount = chess.history().length;
     if (myColor == 'white')
@@ -63,7 +46,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       .map((it: any) => it.to)
       .includes(move.to);
   }
-  const updateBoardAfterMove = (move: { from: Square; to: Square, promotion?: string }) => {
+  function updateBoardAfterMove (move: { from: Square; to: Square, promotion?: string }){
     if (isLegalMove(move)) {
       chess.move(move);
       const mess = JSON.stringify({
