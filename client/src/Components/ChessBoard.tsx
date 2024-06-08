@@ -138,7 +138,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
         <>
           {square ? (
             <img
-              className="lg:w-14 w-11 my-auto"
+              className="lg:w-14 w-11 my-auto "
               src={`/images/${piece}.png`}
             />
           ) : (
@@ -164,7 +164,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
         {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
           i = isFlipped ? i + 1 : 8 - i
           return (
-            <div key={i} className="flex 	">
+            <div key={i} className="flex ">
               {(isFlipped ? row.slice().reverse() : row).map((square, j) => {
                 j = isFlipped ? 8 - j : j + 1
                 const squareRepresentation = (String.fromCharCode(97 + j - 1) +
@@ -174,18 +174,18 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
                 return (
                   <div
                     key={j}
-                    className={`text-black ${isThisLegalSquare(squareRepresentation) ? ((i + j) % 2 == 0 ? "bg-slate-600" : "bg-slate-500") : ((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-16 h-16`}
+                    className={`text-black relative flex justify-center items-center ${isThisLegalSquare(squareRepresentation) ? ((i + j) % 2 == 0 ? "bg-slate-600" : "bg-slate-500") : ((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-16 h-16`}
                     onClick={(e) => makeMoveHandler(squareRepresentation, square)}
                   >
 
 
                     {((!isFlipped && j == 1) || (isFlipped && j == 8)) ? (
-                      <p className="relative  w-[1px] "> {i} </p>
+                      <p className="absolute left-[3px] top-[1px]"> {i} </p>
                     ) : null}
 
                     {displayPiece(square)}
                     {((!isFlipped && i == 1) || (isFlipped && i == 8)) ? (
-                      <p className="relative mt-[45px] w-[2px] right-2">
+                      <p className="absolute top-[42px]  right-[3px]">
                         {
                           String.fromCharCode(97 + j - 1)}
                       </p>
