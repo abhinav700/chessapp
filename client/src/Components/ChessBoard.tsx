@@ -25,14 +25,33 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
   const [showPromotionModal, setShowPromotionModal] = useState(false)
   const [to, setTo] = useState<Square | null>(null)
-  const {promotionOptionsImages} = usePawnPromotion({myColor, from, to, updateBoardAfterMove, setShowPromotionModal})
+  const { promotionOptionsImages } = usePawnPromotion({ myColor, from, to, updateBoardAfterMove, setShowPromotionModal })
+  const [legalMoves, setLegalMoves] = useState<string[]>([]);
+  console.log("Chessboard rerendered")
+  useEffect(() => {
+    console.log("Setting legal moves")
+    setLegalMoves(legalMoves => from !=null ? chess.moves({square : from}) : []);
+  }, [from])
 
+
+  const isThisLegalSquare = (square : Square) => {
+     if(legalMoves.length == 0)
+      return false;
+     let ans = false;
+     legalMoves.map((it) => {
+        if(it.includes(square))
+            ans = true;
+     })
+     if(ans)
+        console.log(square);
+ 
+     return ans;
+  }
 
   useEffect(() => {
     setIsFlipped(isFlipped => myColor === "black");
   }, [myColor])
 
-  
   const isMyTurn = () => {
     let movesCount = chess.history().length;
     if (myColor == 'white')
@@ -40,13 +59,15 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
     else if (myColor == 'black')
       return movesCount % 2 == 1;
   }
+
   const isLegalMove = (move: { from: Square; to: Square, promotion?: string }) => {
     return chess
       .moves({ square: move.from, verbose: true })
       .map((it: any) => it.to)
       .includes(move.to);
   }
-  function updateBoardAfterMove (move: { from: Square; to: Square, promotion?: string }){
+
+  function updateBoardAfterMove(move: { from: Square; to: Square, promotion?: string }) {
     if (isLegalMove(move)) {
       chess.move(move);
       const mess = JSON.stringify({
@@ -65,11 +86,14 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
     setFrom(from => null);
     setTo(to => null)
   }
+
   const makeMoveHandler = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     squareRepresentation: Square | null
   ) => {
+    console.log("make Move handler")
     if (!from) {
+      console.log("setting from")
       setFrom((from) => squareRepresentation);
     } else {
       let move;
@@ -80,7 +104,6 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
         updateBoardAfterMove(move);
 
       }
-
     }
   };
 
@@ -92,10 +115,11 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       return false;
     if (to[1] != '1' && to[1] != '8')
       return false;
+
     setShowPromotionModal(showPromotionModal => true);
     return true;
-
   }
+
   const displayPiece = (
     square: {
       square: Square;
@@ -145,7 +169,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
                 return (
                   <div
                     key={j}
-                    className={`text-black ${(i + j) % 2 == 0 ? "bg-green-800" : "bg-white"} flex w-16 h-16`}
+                    className={`text-black ${isThisLegalSquare(squareRepresentation) ?((i + j) % 2 == 0 ? "bg-slate-600" :"bg-slate-500"):((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-16 h-16`}
                     onClick={(e) => makeMoveHandler(e, squareRepresentation)}
                   >
 
