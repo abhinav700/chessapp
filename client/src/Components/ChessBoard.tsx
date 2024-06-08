@@ -25,11 +25,9 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
   const [showPromotionModal, setShowPromotionModal] = useState(false)
   const [to, setTo] = useState<Square | null>(null)
-  const { promotionOptionsImages } = usePawnPromotion({ myColor, from, to, updateBoardAfterMove, setShowPromotionModal })
+  const { promotionOptionsImages, isPromoting } = usePawnPromotion({ myColor, from, to, updateBoardAfterMove, setShowPromotionModal, chess })
   const [legalMoves, setLegalMoves] = useState<string[]>([]);
-  console.log("Chessboard rerendered")
   useEffect(() => {
-    console.log("Setting legal moves")
     setLegalMoves(legalMoves => from != null ? chess.moves({ square: from }) : []);
   }, [from])
 
@@ -95,22 +93,25 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       color: Color;
     } | null
   ) => {
-    console.log("make Move handler")
     if (!from) {
-      console.log("setting from")
       setFrom((from) => squareRepresentation);
     }
-    
     else {
+      if(from == squareRepresentation && square ){
+        setFrom(from => null)
+        return;
+      }
+
       if (square != null && myColor && square.color == myColor[0]) {
         setFrom(from => squareRepresentation);
         return;
       }
-      
-      else if(square != null && myColor === null){
+
+      else if (square != null && myColor === null) {
         setFrom(from => squareRepresentation);
         return;
       }
+
       let move;
       setTo(to => squareRepresentation)
       if (!isPromoting(squareRepresentation!, from, chess)) {
@@ -122,19 +123,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
     }
   };
 
-  const isPromoting = (to: Square, from: Square, chess: Chess) => {
-    if (!from)
-      return false;
-    const piece = chess.get(from);
-    if (piece.type != 'p')
-      return false;
-    if (to[1] != '1' && to[1] != '8') 
-      return false;
-    if((to[1] == "1" && myColor != "black") || (to[1] == "8" && myColor =="white"))
-      return false;
-    setShowPromotionModal(showPromotionModal => true);
-    return true;
-  }
+
 
   const displayPiece = (
     square: {

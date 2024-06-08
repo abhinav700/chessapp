@@ -1,4 +1,4 @@
-import { Square } from "chess.js";
+import { Chess, Square } from "chess.js";
 import { useEffect, useState } from "react";
 
 type usePawnPromotionProps = {
@@ -7,13 +7,26 @@ type usePawnPromotionProps = {
     from: Square | null;
     to: Square | null;
     setShowPromotionModal: React.Dispatch<React.SetStateAction<boolean>>;
-
+    chess: any;
 }
 
-const usePawnPromotion = ({ myColor, from, to, updateBoardAfterMove, setShowPromotionModal }: usePawnPromotionProps) => {
+const usePawnPromotion = ({ myColor, from, to, updateBoardAfterMove, setShowPromotionModal,chess }: usePawnPromotionProps) => {
     const promotionOptions = ['q', 'r', 'b', 'n']
-    const [promotingTo, setPromotingTo] = useState<null | string>(null)
 
+    const [promotingTo, setPromotingTo] = useState<null | string>(null)
+    const isPromoting = (to: Square, from: Square, chess: Chess) => {
+        if (!from)
+          return false;
+        const piece = chess.get(from);
+        if (piece.type != 'p')
+          return false;
+        if (to[1] != '1' && to[1] != '8') 
+          return false;
+        if((to[1] == '1' && myColor == "white") || to[1] == '8' && myColor == "black")
+            return false;
+        setShowPromotionModal(showPromotionModal => true);
+        return true;
+      }
     const promotionOptionsImages = promotionOptions.map((type) => {
         const color = myColor === "black" ? "b" : 'w';
         const piece = `${color}${type}`;
@@ -34,7 +47,7 @@ const usePawnPromotion = ({ myColor, from, to, updateBoardAfterMove, setShowProm
         }
     }, [promotingTo])
 
-    return {promotionOptionsImages};
+    return {promotionOptionsImages, isPromoting};
 }
 
 export default usePawnPromotion
