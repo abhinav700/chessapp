@@ -151,7 +151,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
   return (
     <>
       {
-        showPromotionModal && <div className="flex flex-col items-center w-[240px] h-[200px] bg-slate-500 relative rounded-lg top-[155px] lg:top-[160px] left-[125px] lg:left-[135px]">
+        showPromotionModal && <div className="flex flex-col z-10 items-center w-[240px] h-[200px] bg-slate-500 relative rounded-lg top-[155px] lg:top-[160px] left-[125px] lg:left-[135px]">
           <h1 className="text-xl"> Pawn Promotion</h1>
           <div className="flex flex-wrap w-[140px] justify-center items-center">
             {promotionOptionsImages}

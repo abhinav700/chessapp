@@ -32,6 +32,7 @@ const usePawnPromotion = ({ myColor, from, to, updateBoardAfterMove, setShowProm
         const piece = `${color}${type}`;
         return (
             <img
+                key = {piece    }
                 className="lg:w-14 w-11 my-3 mx-1 cursor-pointer hover:opacity-70"
                 src={`/images/${piece}.png`}
                 onClick={(e) => { setPromotingTo(promotingTo => type) }}
