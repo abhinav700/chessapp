@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { GAME_OVER, GAME_STARTED, INIT_GAME, MAKE_MOVE } from "../messages";
-import { Chess } from "chess.js";
+import { Chess, Square } from "chess.js";
 import moveSelfAudio from "../assets/sounds/move-self.mp3";
 import { playSound } from "../utils/playSound";
 import gameStartAudio from "../assets/sounds/game-start.mp3";
 
-const useHandleMessage = (socket: WebSocket | null) => {
+const useHandleMessage = (socket: WebSocket | null,  movesList: any,
+  setMovesList: any) => {
   const [chess, setChess] = useState<Chess | null>(new Chess());
   const [board, setBoard] = useState(chess?.board());
   const [playerColor, setPlayerColor] = useState<string | null>(null);
-
   useEffect(() => {
     if (!socket) return;
 
@@ -26,6 +26,7 @@ const useHandleMessage = (socket: WebSocket | null) => {
           try {
             chess?.move(move);
             setBoard(chess?.board());
+            setMovesList((prevMovesList:any) => [...prevMovesList, move]);
             playSound(moveSelfAudio);
           } catch (error) {
             console.log(error);

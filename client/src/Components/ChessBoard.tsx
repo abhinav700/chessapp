@@ -17,21 +17,26 @@ type ChessBoardProps = {
   chess: any;
   setBoard: any;
   myColor: string | null;
+  movesList: any;
+  setMovesList: any;
 };
 
 
-const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps) => {
+const ChessBoard = ({ chess, board, setBoard, socket, myColor, movesList, setMovesList }: ChessBoardProps) => {
   const [from, setFrom] = useState<Square | null>(null);
   const [isFlipped, setIsFlipped] = useRecoilState(isBoardFlippedAtom);
   const [showPromotionModal, setShowPromotionModal] = useState(false)
   const [to, setTo] = useState<Square | null>(null)
   const { promotionOptionsImages, isPromoting } = usePawnPromotion({ myColor, from, to, updateBoardAfterMove, setShowPromotionModal, chess })
   const [legalMoves, setLegalMoves] = useState<string[]>([]);
+
   useEffect(() => {
     setLegalMoves(legalMoves => from != null ? chess.moves({ square: from }) : []);
   }, [from])
 
-
+  useEffect(() => {
+    console.log(movesList);
+  }, [movesList])
   const isThisLegalSquare = (square: Square) => {
     if (legalMoves.length == 0)
       return false;
@@ -40,8 +45,6 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       if (it.includes(square))
         ans = true;
     })
-    if (ans)
-      console.log(square);
 
     return ans;
   }
@@ -77,6 +80,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
 
       setBoard(chess.board());
       playSound(moveSelfAudio);
+      setMovesList((movesList: any) => [...movesList, move])
       socket.send(mess);
     }
     else
@@ -97,7 +101,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
       setFrom((from) => squareRepresentation);
     }
     else {
-      if(from == squareRepresentation && square ){
+      if (from == squareRepresentation && square) {
         setFrom(from => null)
         return;
       }
@@ -138,7 +142,7 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
         <>
           {square ? (
             <img
-              className="lg:w-14 w-11 my-auto "
+              className="lg:w-14 w-10 my-auto "
               src={`/images/${piece}.png`}
             />
           ) : (
@@ -158,45 +162,77 @@ const ChessBoard = ({ chess, board, setBoard, socket, myColor }: ChessBoardProps
           </div>
         </div>
       }
+      <div className="flex flex-row">
 
-      <div className={`text-white ${showPromotionModal ? 'mt-[-200px]' : ""}`}>
-        {myColor && <h1>{isMyTurn() ? "Your Turn" : "Opponent's Turn"}</h1>}
-        {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
-          i = isFlipped ? i + 1 : 8 - i
-          return (
-            <div key={i} className="flex ">
-              {(isFlipped ? row.slice().reverse() : row).map((square, j) => {
-                j = isFlipped ? 8 - j : j + 1
-                const squareRepresentation = (String.fromCharCode(97 + j - 1) +
-                  "" +
-                  (i)) as Square;
-                // console.log(squareRepresentation)
-                return (
-                  <div
-                    key={j}
-                    className={`text-black relative flex justify-center items-center ${isThisLegalSquare(squareRepresentation) ? ((i + j) % 2 == 0 ? "bg-slate-600" : "bg-slate-500") : ((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-16 h-16`}
-                    onClick={(e) => makeMoveHandler(squareRepresentation, square)}
-                  >
+        <div className={`text-white ${showPromotionModal ? 'mt-[-200px]' : ""}`}>
+          {myColor && <h1>{isMyTurn() ? "Your Turn" : "Opponent's Turn"}</h1>}
+          {(isFlipped ? board.slice().reverse() : board).map((row, i) => {
+            i = isFlipped ? i + 1 : 8 - i
+            return (
+              <div key={i} className="flex ">
+                {(isFlipped ? row.slice().reverse() : row).map((square, j) => {
+                  j = isFlipped ? 8 - j : j + 1
+                  const squareRepresentation = (String.fromCharCode(97 + j - 1) +
+                    "" +
+                    (i)) as Square;
+                  // console.log(squareRepresentation)
+                  return (
+                    <div
+                      key={j}
+                      className={`text-black relative flex justify-center items-center ${isThisLegalSquare(squareRepresentation) ? ((i + j) % 2 == 0 ? "bg-slate-600" : "bg-slate-500") : ((i + j) % 2 == 0 ? "bg-green-800" : "bg-white")} flex w-12 lg:w-16 h-14 lg:h-16`}
+                      onClick={(e) => makeMoveHandler(squareRepresentation, square)}
+                    >
 
 
-                    {((!isFlipped && j == 1) || (isFlipped && j == 8)) ? (
-                      <p className="absolute left-[3px] top-[1px]"> {i} </p>
-                    ) : null}
+                      {((!isFlipped && j == 1) || (isFlipped && j == 8)) ? (
+                        <p className="absolute lg:left-[3px] left-[1px] top-[-1px] lg:top-[1px]"> {i} </p>
+                      ) : null}
 
-                    {displayPiece(square)}
-                    {((!isFlipped && i == 1) || (isFlipped && i == 8)) ? (
-                      <p className="absolute top-[42px]  right-[3px]">
-                        {
-                          String.fromCharCode(97 + j - 1)}
-                      </p>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+                      {displayPiece(square)}
+                      {((!isFlipped && i == 1) || (isFlipped && i == 8)) ? (
+                        <p className="absolute lg:top-[42px] top-[38px]  right-[3px]">
+                          {
+                            String.fromCharCode(97 + j - 1)}
+                        </p>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+
+        {
+          myColor &&
+        <div className="bg-slate-500 w-[200px] h-[450px]  mx-8 rounded-lg " >
+          <table className="rounded-lg  h-[450px] ">
+            <thead>
+
+              <tr className="w-[200px] flex justify-between">
+                <td className="text-lg w-[100px] border-solid border-white border-[2px]">From </td>
+                <td className="text-lg w-[100px] border-solid border-white border-[2px]">To </td>
+              </tr>
+            </thead>
+            <tbody className="h-[420px] overflow-x-hidden overflow-y-auto block">
+              {
+
+                movesList.map((it: any) => {
+                  return (
+
+                    <tr className="w-[200px] flex justify-between" >
+                      <td className="text-lg w-[100px] border-solid border-white border-[2px]">{it.from} </td>
+                      <td className="text-lg w-[100px] border-solid border-white border-[2px]">{it.to}</td>
+                    </tr>)
+
+                })
+              }
+            </tbody>
+          </table>
+        </div>
+        }
       </div>
+
     </>
 
   );
