@@ -25,7 +25,7 @@ const Game = () => {
       <div className="mt-8  mx-[50px] max-w-screen-xl w-[100vw] flex flex-row justify-center items-center grid grid-cols-6 gap-4">
         <div className="col-span-4 w-full  bg--500">
           <ChessBoard
-            chess={chess}
+            chess={chess!}
             board={board!}
             socket={socket}
             setBoard={setBoard}
