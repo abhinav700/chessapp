@@ -45,6 +45,15 @@ const ChessBoard = ({
   const [legalMoves, setLegalMoves] = useState<string[]>([]);
 
   const isKingSideCastlingLegal = () => {
+    // check for castling only if its our turn and we have selected our king
+    if (
+      !(
+        (chess.turn() == "w" && myColor == "white" && from == "e1") ||
+        (chess.turn() == "b" && myColor == "black" && from == "e8")
+      )
+    )
+      return false;
+
     if (chess.getCastlingRights(myColor![0] as any).k == false) return false;
     if (chess.inCheck()) return false;
 
@@ -75,36 +84,67 @@ const ChessBoard = ({
     return ans;
   };
 
+  const isQueenSideCastlingLegal = () => {
+    // check for castling only if its our turn and we have selected our king
+    if (
+      !(
+        (chess.turn() == "w" && myColor == "white" && from == "e1") ||
+        (chess.turn() == "b" && myColor == "black" && from == "e8")
+      )
+    )
+      return false;
+
+    if (chess.getCastlingRights(myColor![0] as any).q == false) return false;
+    if (chess.inCheck()) return false;
+
+    // If squares b/w rook and king are under attack by opponent
+    const squaresBetween =
+      myColor == "white" ? ["b1", "c1", "d1"] : ["b8", "c8", "d8"]; // squares between king and rook
+    const opponentSide = myColor == "white" ? "b" : "w";
+
+    let ans: boolean = true;
+    squaresBetween.map((it) => {
+      if (chess.isAttacked(it as any, opponentSide)) ans = false;
+    });
+
+    // if squares b/w rook and king are occupied by a piece
+    const indexesToCheck =
+      myColor == "white"
+        ? [
+            [7, 2],
+            [7, 3],
+          ]
+        : [
+            [0, 2],
+            [0, 3],
+          ];
+    indexesToCheck.map((it) => {
+      if (board[it[0]][it[1]]) ans = false;
+    });
+
+    return ans;
+  };
+
   useEffect(() => {
     let arr: string[] = [];
     if (from != null) {
       arr = chess.moves({ square: from });
-      if (
-        (chess.turn() == "w" && myColor == "white" && from == "e1") ||
-        (chess.turn() == "b" && myColor == "black" && from == "e8")
-      ) {
-        if (isKingSideCastlingLegal()) {
-          const squaresBetween =
-            myColor == "white" ? ["f1", "g1"] : ["f8", "g8"]; // squares between king and rook
-          squaresBetween.map((it) => {
-            arr.push(it);
-          });
-        }
+
+      if (isKingSideCastlingLegal()) {
+        const squaresBetween = myColor == "white" ? ["f1", "g1"] : ["f8", "g8"]; // squares between king and rook
+        squaresBetween.map((it) => {
+          arr.push(it);
+        });
+      }
+
+      if (isQueenSideCastlingLegal()) {
+        // squares between king and rook
+        const squaresBetween = myColor == "white" ? ["c1", "d1"] : ["c8", "d8"] 
+        squaresBetween.map((it) => {
+          arr.push(it);
+        });
       }
     }
-
-    // if(k){
-    //   if(myColor=='white' && (square ==  "f1" || square =="g1"))
-
-    //   if(myColor == "black" && (square == "f8" || square == "g8"))
-    //       return true;
-    // }
-    // if(q){
-    //   if(myColor=='white' && (square ==  "b1" || square =="c1" || square == "d1"))
-    //     return true;
-    // if(myColor == "black" && (square == "b8" || square == "c8" || square == "d8"))
-    //     return true;
-    // }
     setLegalMoves((legalMoves) => arr);
   }, [from]);
 
@@ -222,15 +262,6 @@ const ChessBoard = ({
   };
   return (
     <>
-      {
-        <h1>
-          {JSON.stringify(
-            myColor
-              ? chess.getCastlingRights(myColor[0] as any)
-              : "Game not started yet"
-          )}
-        </h1>
-      }
       {/*Displaying promotion modal when pawn reaches last row */}
       {showPromotionModal && (
         <div className="flex flex-col z-10 items-center w-[240px] h-[200px] bg-slate-500 relative rounded-lg top-[155px] lg:top-[160px] left-[125px] lg:left-[135px]">
