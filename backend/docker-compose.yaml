@@ -2,7 +2,7 @@ services:
   chess-app-backend:
     build:
       context: ./
-      target:  development
+      target: development
     ports:
       - 8080:8080
     volumes:
