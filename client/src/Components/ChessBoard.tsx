@@ -214,6 +214,7 @@ const ChessBoard = ({
     if (!from) {
       setFrom((from) => squareRepresentation);
     } else {
+      setShowPromotionModal(false)
       if (from == squareRepresentation && square) {
         setFrom((from) => null);
         return;
@@ -230,6 +231,7 @@ const ChessBoard = ({
       let move;
       setTo((to) => squareRepresentation);
       if (!isPromoting(squareRepresentation!, from, chess)) {
+        setShowPromotionModal(false)
         move = { from: from!, to: squareRepresentation! };
         console.log(move);
         updateBoardAfterMove(move);
@@ -329,7 +331,7 @@ const ChessBoard = ({
 
         {/* Displaying list of moves made */}
         {myColor && (
-          <div className="bg-slate-500 w-[200px] h-[450px]  mx-8 rounded-lg ">
+          <div className="bg-slate-500 w-[200px] h-[450px]  mx-8 rounded-lg" style = {{position:"relative",bottom: showPromotionModal ? "200px":0}}>
             <table className="rounded-lg  h-[450px] ">
               <thead>
                 <tr className="w-[200px] flex justify-between">
