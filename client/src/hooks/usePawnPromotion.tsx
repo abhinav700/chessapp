@@ -18,11 +18,16 @@ const usePawnPromotion = ({ myColor, from, to, updateBoardAfterMove, setShowProm
         if (!from)
           return false;
         const piece = chess.get(from);
+        console.log(piece, myColor)
         if (piece.type != 'p')
           return false;
+        
         if (to[1] != '1' && to[1] != '8') 
           return false;
-        if((to[1] == '1' && myColor == "white") || to[1] == '8' && myColor == "black")
+        if(myColor![0] != piece.color)
+            return false;
+
+        if(!((to[1] == '8' && myColor == "white") || (to[1] == '1' && myColor == "black")))
             return false;
         setShowPromotionModal(showPromotionModal => true);
         return true;
