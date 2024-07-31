@@ -2,6 +2,10 @@
 A simple chess application build using chess.js API for validation logic and reactjs for frontend components.
 
 
+
+https://github.com/user-attachments/assets/1a09f14f-744d-4dde-a357-a6cc91c5c20d
+
+
 # Setting up Locally
 ## Docker
 
