@@ -127,7 +127,7 @@ const ChessBoard = ({
 
   useEffect(() => {
     let arr: string[] = [];
-    if (from != null) {
+    if (from != null && chess.get(from).color == myColor![0]) {
       arr = chess.moves({ square: from });
 
       if (isKingSideCastlingLegal()) {
