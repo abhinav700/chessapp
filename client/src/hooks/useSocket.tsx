@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+require("dotenv").config();
 
-const WS_SERVER_URL = "ws://localhost:8080";
+const WS_SERVER_URL = process.env.REACT_APP_WS_SERVER_URL
+  ? process.env.REACT_APP_WS_SERVER_URL
+  : "ws://localhost:8080";
 
 const useSocket = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
